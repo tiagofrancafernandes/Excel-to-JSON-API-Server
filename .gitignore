@@ -1,2 +1,8 @@
 vendor
 *.log
+*no*commit*
+*No*Commit*
+*NO*COMMIT*
+*.bkp.*
+*.bkp
+.env
