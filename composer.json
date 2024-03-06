@@ -1,7 +1,8 @@
 {
     "require": {
         "spatie/simple-excel": "^3.4",
-        "symfony/var-dumper": "^7.0"
+        "symfony/var-dumper": "^7.0",
+        "tracy/tracy": "^2.10"
     },
     "autoload": {
         "psr-4": {
