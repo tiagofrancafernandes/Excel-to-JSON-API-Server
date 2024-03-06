@@ -6,3 +6,9 @@ vendor
 *.bkp.*
 *.bkp
 .env
+
+# PHP
+/vendor
+
+# Vercel
+.vercel

@@ -19,6 +19,32 @@ GET http://your-backend-server.com/?type=csv
 
 ----
 
+## Vercel deployment
+
+<a href="https://vercel.com/new/project?template=https://github.com/tiagofrancafernandes/Excel-to-JSON-API-Server/tree/master/php"><img src="https://vercel.com/button"></a>
+
+[Read more](https://github.com/vercel-community/php)
+----
+
+```sh
+# Install it globally
+npm i -g vercel
+
+# Log in
+vercel login
+
+# Let's fly
+vercel
+```
+
+OR
+```sh
+# Log in
+npx vercel login
+
+# Let's fly
+npx vercel
+```
 ## WIP
 
 ### TODO
