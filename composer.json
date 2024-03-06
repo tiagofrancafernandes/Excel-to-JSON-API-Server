@@ -1,5 +1,6 @@
 {
     "require": {
-        "spatie/simple-excel": "^3.4"
+        "spatie/simple-excel": "^3.4",
+        "symfony/var-dumper": "^7.0"
     }
 }
