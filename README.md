@@ -21,7 +21,7 @@ GET http://your-backend-server.com/?type=csv
 
 ## Vercel deployment
 
-<a href="https://vercel.com/new/project?template=https://github.com/tiagofrancafernandes/Excel-to-JSON-API-Server/tree/vercel/beta"><img src="https://vercel.com/button"></a>
+<a href="https://vercel.com/new/project?template=https://github.com/tiagofrancafernandes/Excel-to-JSON-API-Server/tree/master"><img src="https://vercel.com/button"></a>
 
 [Read more](https://github.com/vercel-community/php)
 ----
