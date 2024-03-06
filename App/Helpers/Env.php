@@ -7,11 +7,15 @@ class Env
     protected array $rawEnv = [];
     protected array $env = [];
 
-    public function __construct(?string $baseDir = null, string $envFile = '.env')
-    {
+    public function __construct(
+        ?string $baseDir = null,
+        string $envFile = '.env',
+        array $initialData = [],
+    ) {
         $this->loadSystemEnv();
         $this->loadFromFile($baseDir, $envFile);
         $this->prepareEnv();
+        $this->prepareInitialData($initialData);
     }
 
     protected function loadFromFile(?string $baseDir = null, string $envFile = '.env'): void
@@ -34,7 +38,7 @@ class Env
             }
 
             $key = $line['key'] ?? null;
-            $value = $line['value'] ?? null;
+            $value = static::mutateValue($line['value'] ?? null);
 
             if (!$key) {
                 continue;
@@ -47,6 +51,17 @@ class Env
     protected function loadSystemEnv(): void
     {
         foreach (getenv() as $key => $value) {
+            $this->rawEnv[$key] = $value;
+        }
+    }
+
+    protected function prepareInitialData(array $initialData): void
+    {
+        foreach ($initialData as $key => $value) {
+            if (!$key || !is_string($key) || !trim($key)) {
+                continue;
+            }
+
             $this->rawEnv[$key] = $value;
         }
     }
@@ -86,10 +101,6 @@ class Env
             return null;
         }
 
-        if ($checkAny($line, 'str_ends_with', ['#', '=', '"', "'"])) {
-            return null;
-        }
-
         if (!$checkAny($line, 'str_contains', ['='])) {
             return null;
         }
@@ -102,9 +113,19 @@ class Env
             return null;
         }
 
+        $value = $line[1] ?? null;
+
+        if (
+            $checkAny("{$value}", 'str_starts_with', ['"', "'"])
+            && $checkAny("{$value}", 'str_ends_with', ['"', "'"])
+        ) {
+            $toTrim = str_starts_with("{$value}", '"') && str_ends_with("{$value}", '"') ? '"' : "'";
+            $value = trim($value, $toTrim);
+        }
+
         return [
             'key' => $key,
-            'value' => $line[1] ?? null,
+            'value' => $value,
         ];
     }
 
@@ -138,16 +159,19 @@ class Env
     public static function mutateValue(mixed $value): mixed
     {
         return match ($value) {
-            'False','false', 'FALSE', false, => false,
-            'True','true', 'TRUE', true, => true,
-            '', 'null', 'NULL', null, => null,
+            'False', 'false', 'FALSE', false => false,
+            'True', 'true', 'TRUE', true => true,
+            '', 'null', 'NULL', null => null,
             default => $value,
         };
     }
 
-    public static function init(?string $baseDir = null, string $envFile = '.env'): static
-    {
-        return new static($baseDir, $envFile);
+    public static function init(
+        ?string $baseDir = null,
+        string $envFile = '.env',
+        array $initialData = [],
+    ): static {
+        return new static($baseDir, $envFile, $initialData);
     }
 
     public static function get(?string $key = null, mixed $default = null): mixed
