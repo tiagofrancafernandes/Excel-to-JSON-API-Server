@@ -17,7 +17,7 @@ class Reader
             ]) ? $type : null;
 
             if (!$type) {
-                app_abort(422, 'Invalid Type');
+                response_as_json(['error' => 'Invalid Type'], 422);
 
                 exit((int) 422);
             }
@@ -26,7 +26,7 @@ class Reader
             $source = filter_var($source, FILTER_VALIDATE_URL) ?: filter_var(urldecode($source), FILTER_VALIDATE_URL);
 
             if (!$source) {
-                app_abort(422, 'Invalid URL');
+                response_as_json(['error' => 'Invalid URL'], 422);
 
                 exit((int) 422);
             }
@@ -39,7 +39,7 @@ class Reader
             }
 
             if (!is_file($sourceLocalPath) || !filesize($sourceLocalPath)) {
-                app_abort(404);
+                response_as_json(['error' => 'Invalid file'], 404);
 
                 exit((int) 404);
             }
