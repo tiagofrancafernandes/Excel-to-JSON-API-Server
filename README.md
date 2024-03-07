@@ -21,6 +21,33 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 &fromSheet=
 ```
 
+#### Accepted params
+
+| Param      | Description | Note | Default value |
+| ----------- | ----------- | --- | ----------- |
+|`type` | Type of file to be read| `csv`, `xlsx` or `ods` | `csv` |
+|`source` | URL of file to be read | | |
+|`headersToSnakeCase` | If make lower cased on headers | | `false`|
+|`filterBy` | Key (header column) to filter data  | | |
+|`filterOperator` | See `List of values to 'filterOperator'` | | search|
+|`filterValue` | Value to compare | | |
+|`fromSheetName` | Sheet name to get data (when != `type` != `csv`) | | |
+|`fromSheet` | Sheet position to get data (when != `type` != `csv`) | | |
+
+
+* List of values to `filterOperator`:
+
+```sh
+'=', 'equal'                   #/ =
+'!=', 'notequal', 'notEqual'   # !=
+'>', 'gt'                      #/ >
+'>=', 'ge'                     # >=
+'<', 'lt'                      #/ <
+'<=', 'le'                     # <=
+'contains', 'like'             # compare values case sensitive
+'*', 'search', 'ilike'         # compare values case insensitive
+```
+
 ----
 
 ## Vercel deployment
@@ -49,6 +76,19 @@ npx vercel login
 # Let's fly
 npx vercel
 ```
+-----
+## Using Google Spreadsheets
+1. Create a copy of this [spreadsheets](https://docs.google.com/spreadsheets/d/1HVlosr3KKFDcZAUTA_QECroLTKXklVU4ZnWcpZySnBc/edit?usp=sharing)
+2. Go to Share and select 'Anyone with link'
+3. Go to `File` -> `Share` -> `Publish on the web`
+    - Select `products` sheet
+    - Select `.csv` option
+    - Copy the generated URL
+    - Encode the URL like `https://docs.google.com/spreadsheets/d/` to `https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd`
+    - Use parsed URL on `source` request key
+4. Make request like `https://csv-to-json-api.vercel.app/?type=csv&source=YOUR_URL_HERE`
+-----
+
 ## WIP
 
 ### TODO
