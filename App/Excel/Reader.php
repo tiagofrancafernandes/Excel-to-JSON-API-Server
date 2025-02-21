@@ -36,8 +36,6 @@ class Reader
 
             $toDeleteFile = !is_to_cache() && is_file($sourceLocalPath);
 
-            unlink($sourceLocalPath);
-
             if ($toDeleteFile) {
                 unlink($sourceLocalPath);
             }
