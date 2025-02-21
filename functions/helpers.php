@@ -159,9 +159,12 @@ if (!function_exists('request_header_get')) {
             return $defaultValue;
         }
 
-        $key = strtoupper("HTTP_{$key}");
+        $key = str_replace(['-', '_'], '_', $key);
 
-        return $_SERVER[$key] ?? $defaultValue;
+        $key = strtoupper("HTTP_{$key}");
+        $forwardedkey = strtoupper("HTTP_X_FORWARDED_{$key}");
+
+        return $_SERVER[$key] ?? $_SERVER[$forwardedkey] ?? $defaultValue;
     }
 }
 
@@ -226,5 +229,80 @@ if (!function_exists('on_cli')) {
     function on_cli(): bool
     {
         return \PHP_SAPI === 'cli';
+    }
+}
+
+if (!function_exists('request_input_bool')) {
+    /**
+     * function request_input_bool
+     *
+     * @param ?string $key
+     * @param ?bool $defaultValue
+     *
+     * @return mixed
+     */
+    function request_input_bool(?string $key, ?bool $defaultValue = null): mixed
+    {
+        $value = request_any_get($key, null);
+
+        if ($value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaultValue;
+    }
+}
+
+if (!function_exists('to_bool')) {
+    /**
+     * function to_bool
+     *
+     * @param mixed $value
+     * @param ?bool $defaultValue
+     *
+     * @return mixed
+     */
+    function to_bool(mixed $value, ?bool $defaultValue = null): mixed
+    {
+        return boolval(filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaultValue);
+    }
+}
+
+if (!function_exists('is_to_cache')) {
+    /**
+     * function is_to_cache
+     *
+     * @return bool
+     */
+    function is_to_cache(): bool
+    {
+        $noCacheValue = request_header_get('no-cache', request_any_get('no-cache'));
+        $noCacheValue = $noCacheValue === "" ? true : to_bool($noCacheValue);
+
+        if ($noCacheValue) {
+            return false;
+        }
+
+        $toCacheValue = request_header_get('to-cache', request_any_get('to-cache')) ?? true;
+        $toCacheValue = $toCacheValue === "" ? true : to_bool($toCacheValue);
+
+        return to_bool($toCacheValue);
+    }
+}
+
+if (!function_exists('die_as_json')) {
+    /**
+     * function die_as_json
+     *
+     * @param mixed ...$data
+     *
+     * @return void
+     */
+    function die_as_json(
+        mixed ...$data,
+    ): void {
+        response_as_json($data, 500);
+
+        die;
     }
 }

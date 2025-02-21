@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>CSV Parse JS Way</title>
+    <style
+        type="text/css"
+        nonce
+    >
+        .long-top-space {
+            position: relative;
+            top: 65vh;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h5 class="long-top-space">Look to console</h5>
+
+    <script nonce>
+        const CSVHelpers = {
+            parse(csvString) {
+                csvString = typeof csvString === 'string' ? csvString : '';
+                const lines = csvString
+                    .trim()
+                    .split('\n')
+                    .filter(i => i.trim());
+                const headers = lines[0].split(',');
+                const jsonArray = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',');
+                    const obj = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        obj[headers[j]] = values[j];
+                    }
+                    jsonArray.push(obj);
+                }
+
+                return jsonArray;
+            }
+        };
+
+        function demoCSVRequestAndParse() {
+            // Busca um conteúdo em CSV (.csv)
+            // Demo FILE: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRprxfriS6WWxSbAhQsZOfON7koY4Fci1j1Biv4Ms0XSiZuIQeHnjzcmpwbEvIY8EdxPqX_PA4Ko9Ky/pub?output=csv'
+            let onlineCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRprxfriS6WWxSbAhQsZOfON7koY4Fci1j1Biv4Ms0XSiZuIQeHnjzcmpwbEvIY8EdxPqX_PA4Ko9Ky/pub?output=csv';
+            fetch(
+                onlineCSVUrl,
+                {
+                    method: 'GET', // ou 'POST' se necessário
+                    headers: {
+                        Accept: 'text/csv' // Embora não estritamente necessário, é uma boa prática
+                    }
+                }
+            )
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
+                    }
+                    return response.text(); // Especifica que queremos o corpo da resposta como texto
+                })
+                .then(csvText => {
+                    const jsonArray = CSVHelpers.parse(csvText);
+                    console.log(jsonArray);
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar o CSV:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', demoCSVRequestAndParse);
+    </script>
+</body>
+
+</html>

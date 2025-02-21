@@ -17,7 +17,7 @@ class Reader
             ]) ? $type : null;
 
             if (!$type) {
-                response_as_json(['error' => 'Invalid Type'], 422);
+                response_as_json(['error' => 'Invalid Type', ...static::helpMessage()], 422);
 
                 exit((int) 422);
             }
@@ -26,7 +26,7 @@ class Reader
             $source = filter_var($source, FILTER_VALIDATE_URL) ?: filter_var(urldecode($source), FILTER_VALIDATE_URL);
 
             if (!$source) {
-                response_as_json(['error' => 'Invalid URL'], 422);
+                response_as_json(['error' => 'Invalid URL', ...static::helpMessage()], 422);
 
                 exit((int) 422);
             }
@@ -34,12 +34,19 @@ class Reader
             $sourceMD5 = md5($source);
             $sourceLocalPath = temp_path('excel-db-' . $sourceMD5 . '.' . $type);
 
+            $toDeleteFile = !is_to_cache() && is_file($sourceLocalPath);
+
+            unlink($sourceLocalPath);
+            // if ($toDeleteFile) {
+            //     unlink($sourceLocalPath);
+            // }
+
             if (!is_file($sourceLocalPath)) {
                 file_put_contents($sourceLocalPath, file_get_contents($source));
             }
 
             if (!is_file($sourceLocalPath) || !filesize($sourceLocalPath)) {
-                response_as_json(['error' => 'Invalid file'], 404);
+                response_as_json(['error' => 'Invalid file', ...static::helpMessage()], 404);
 
                 exit((int) 404);
             }
@@ -102,5 +109,17 @@ class Reader
 
             exit((int) 500);
         }
+    }
+
+    public static function helpMessage(): array
+    {
+        $repoUrl = 'https://github.com/tiagofrancafernandes/Excel-to-JSON-API-Server';
+
+        return [
+            'help' => [
+                'doc' => "For help, read the doc in {$repoUrl}?tab=readme-ov-file#readme",
+                'repoUrl' => $repoUrl,
+            ]
+        ];
     }
 }

@@ -10,9 +10,4 @@ require_once __DIR__ . '/../vendor/symfony/var-dumper/Resources/functions/dump.p
 
 require_once __DIR__ . '/cors.php';
 
-$toCache = !filter_var(request_any_get('no-cache', false), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-
-if ($toCache) {
-    require_once __DIR__ . '/cache.php';
-}
-
+require_once __DIR__ . '/cache.php';
