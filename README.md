@@ -40,12 +40,19 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 ```sh
 '=', 'equal'                   #/ =
 '!=', 'notequal', 'notEqual'   # !=
-'>', 'gt'                      #/ >
+'>', 'gt'                      # >
 '>=', 'ge'                     # >=
-'<', 'lt'                      #/ <
+'<', 'lt'                      # <
 '<=', 'le'                     # <=
 'contains', 'like'             # compare values case sensitive
 '*', 'search', 'ilike'         # compare values case insensitive
+'filled', 'notEmpty',          # check if values has value
+## TODO: # 'length-eq', 'leq', 'length'   # BETA value length is 'eq'
+## TODO: # 'length-ne', 'lne'             # BETA value length is 'ne'
+## TODO: # 'length-gt', 'lgt'             # BETA value length is 'gt'
+## TODO: # 'length-ge', 'lge'             # BETA value length is 'ge'
+## TODO: # 'length-lt', 'llt'             # BETA value length is 'lt'
+## TODO: # 'length-le', 'lle'             # BETA value length is 'le'
 ```
 
 ----

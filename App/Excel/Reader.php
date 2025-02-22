@@ -81,6 +81,7 @@ class Reader
                     '>=', 'ge' => ($rowProperties[$filterBy] ?? null) >= $filterValue,
                     '<', 'lt' => ($rowProperties[$filterBy] ?? null) < $filterValue,
                     '<=', 'le' => ($rowProperties[$filterBy] ?? null) <= $filterValue,
+                    'filled', 'notEmpty' => filled($rowProperties[$filterBy] ?? null),
                     'contains', 'like' => str_contains(strval($rowProperties[$filterBy] ?? null), strval($filterValue)),
                     '*', 'search', 'ilike' => str_contains(
                         strtolower(strval($rowProperties[$filterBy] ?? null)),
