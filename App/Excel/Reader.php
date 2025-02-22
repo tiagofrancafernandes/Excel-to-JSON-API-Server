@@ -55,6 +55,17 @@ class Reader
             $filterValue = request_any_get('filterValue');
             $filterOperator = request_any_get('filterOperator', 'search');
 
+            $filters = request_any_get('filters');
+            $filters = array_filter(is_array($filters) ? $filters : [], fn ($filter) => is_array($filter));
+
+            if (filled($filterBy) && (filled($filterValue) || filled($filterOperator))) {
+                $filters[] = [
+                    'key' => $filterBy,
+                    'value' => $filterValue,
+                    'operator' => $filterOperator,
+                ];
+            }
+
             $fromSheetName = $type != 'csv' ? request_any_get('fromSheetName') : null;
             $fromSheet = $type != 'csv' ? filter_var(request_any_get('fromSheet'), FILTER_VALIDATE_INT) : null;
             $rows = SimpleExcelReader::create($sourceLocalPath, $type);
@@ -73,21 +84,47 @@ class Reader
 
             $rows = $rows->getRows();
 
-            if ($filterBy) {
-                $rows = $rows->filter(fn (array $rowProperties) => match ($filterOperator) {
-                    '=', 'equal' => ($rowProperties[$filterBy] ?? null) == $filterValue,
-                    '!=', 'notequal', 'notEqual' => ($rowProperties[$filterBy] ?? null) != $filterValue,
-                    '>', 'gt' => ($rowProperties[$filterBy] ?? null) > $filterValue,
-                    '>=', 'ge' => ($rowProperties[$filterBy] ?? null) >= $filterValue,
-                    '<', 'lt' => ($rowProperties[$filterBy] ?? null) < $filterValue,
-                    '<=', 'le' => ($rowProperties[$filterBy] ?? null) <= $filterValue,
-                    'filled', 'notEmpty' => filled($rowProperties[$filterBy] ?? null),
-                    'contains', 'like' => str_contains(strval($rowProperties[$filterBy] ?? null), strval($filterValue)),
-                    '*', 'search', 'ilike' => str_contains(
-                        strtolower(strval($rowProperties[$filterBy] ?? null)),
-                        strtolower(strval($filterValue))
-                    ),
-                    default => ($rowProperties[$filterBy] ?? null) == $filterValue,
+            if ($filters) {
+                $rows = $rows->filter(function (array $rowProperties) use ($filters) {
+                    foreach ($filters as $_filter) {
+                        if (!is_array($_filter) || !$_filter) {
+                            continue;
+                        }
+
+                        $_filterKey = $_filter['key'] ?? $_filter['by'] ?? null;
+                        $filterValue = $_filter['value'] ?? null;
+                        $filterOperator = $_filter['operator'] ?? null;
+
+                        if (is_null($_filterKey)) {
+                            continue;
+                        }
+
+                        if (is_null($filterOperator) || $filterOperator === '') {
+                            $filterOperator = 'equal';
+                        }
+
+                        $result = match ($filterOperator) {
+                            '=', 'equal' => ($rowProperties[$_filterKey] ?? null) == $filterValue,
+                            '!=', 'notequal', 'notEqual', 'ne' => ($rowProperties[$_filterKey] ?? null) != $filterValue,
+                            '>', 'gt' => ($rowProperties[$_filterKey] ?? null) > $filterValue,
+                            '>=', 'ge' => ($rowProperties[$_filterKey] ?? null) >= $filterValue,
+                            '<', 'lt' => ($rowProperties[$_filterKey] ?? null) < $filterValue,
+                            '<=', 'le' => ($rowProperties[$_filterKey] ?? null) <= $filterValue,
+                            'filled', 'notEmpty' => filled($rowProperties[$_filterKey] ?? null),
+                            'contains', 'like' => str_contains(strval($rowProperties[$_filterKey] ?? null), strval($filterValue)),
+                            '*', 'search', 'ilike' => str_contains(
+                                strtolower(strval($rowProperties[$_filterKey] ?? null)),
+                                strtolower(strval($filterValue))
+                            ),
+                            default => ($rowProperties[$_filterKey] ?? null) == $filterValue,
+                        };
+
+                        if (!$result) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 });
             }
 
@@ -96,11 +133,7 @@ class Reader
             response_as_json([
                 'data' => $rows,
                 'count' => count((array) $rows),
-                'filters' => [
-                    'filterBy' => $filterBy,
-                    'filterValue' => $filterValue,
-                    'filterOperator' => $filterOperator,
-                ],
+                'filters' => $filters,
             ]);
 
             die();

@@ -38,21 +38,50 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 * List of values to `filterOperator`:
 
 ```sh
-'=', 'equal'                   #/ =
-'!=', 'notequal', 'notEqual'   # !=
-'>', 'gt'                      # >
-'>=', 'ge'                     # >=
-'<', 'lt'                      # <
-'<=', 'le'                     # <=
-'contains', 'like'             # compare values case sensitive
-'*', 'search', 'ilike'         # compare values case insensitive
-'filled', 'notEmpty',          # check if values has value
+'=', 'equal'                                    # =
+'!=', 'ne', 'notequal', 'notEqual'              # !=
+'>', 'gt'                                       # >
+'>=', 'ge'                                      # >=
+'<', 'lt'                                       # <
+'<=', 'le'                                      # <=
+'contains', 'like'                              # compare values case sensitive
+'*', 'search', 'ilike'                          # compare values case insensitive
+'filled', 'notEmpty',                           # check if values has value
 ## TODO: # 'length-eq', 'leq', 'length'   # BETA value length is 'eq'
 ## TODO: # 'length-ne', 'lne'             # BETA value length is 'ne'
 ## TODO: # 'length-gt', 'lgt'             # BETA value length is 'gt'
 ## TODO: # 'length-ge', 'lge'             # BETA value length is 'ge'
 ## TODO: # 'length-lt', 'llt'             # BETA value length is 'lt'
 ## TODO: # 'length-le', 'lle'             # BETA value length is 'le'
+```
+
+###### Filter example #1:
+```sh
+GET https://csv-to-json-api.vercel.app/?type=csv
+&source=...
+&filters[0][key]=pergunta         # or
+&filters[0][by]=pergunta          # or
+&filterBy=pergunta                # or
+
+&filters[0][operator]=contains    # or
+&filterOperator=contains          # or
+
+&filters[0][operator]=filled      # or
+&filterOperator=filled            # or
+
+&filters[0][value]=abc            #or
+&filterValue=abc                  #or
+```
+
+###### Filter example #2:
+```sh
+GET https://csv-to-json-api.vercel.app/?type=csv
+&headersToSnakeCase=true
+&filters[0][key]=pergunta
+&filters[0][operator]=filled
+&filters[1][key]=inativo
+&filters[1][operator]=ne
+&filters[1][value]=sim
 ```
 
 ----
