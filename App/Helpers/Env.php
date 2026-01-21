@@ -92,7 +92,7 @@ class Env
         $checkAny = function (?string $str, callable $callable, array|string ...$values) {
             $values = is_array($values[0] ?? null) ? array_filter(
                 $values[0],
-                fn($item) => $item && is_string($item)
+                fn ($item) => $item && is_string($item)
             ) : $values;
 
             if (!$values) {

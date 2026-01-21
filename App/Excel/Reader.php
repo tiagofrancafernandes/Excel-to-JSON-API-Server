@@ -94,7 +94,7 @@ class Reader
             $filterOperator = request_any_get('filterOperator', 'search');
 
             $filters = request_any_get('filters');
-            $filters = array_filter(is_array($filters) ? $filters : [], fn($filter) => is_array($filter));
+            $filters = array_filter(is_array($filters) ? $filters : [], fn ($filter) => is_array($filter));
 
             if (filled($filterBy) && (filled($filterValue) || filled($filterOperator))) {
                 $filters[] = [
@@ -178,7 +178,9 @@ class Reader
 
             die();
         } catch (\Throwable $th) {
-            throw $th;
+            if (get_env('APP_ENV') !== 'production' || get_env('APP_DEBUG')) {
+                throw $th;
+            }
 
             app_abort(500);
 

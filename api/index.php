@@ -11,10 +11,11 @@ if (filter_var(request_any_get('ui', false), FILTER_VALIDATE_BOOL) || filter_var
     $content = file_get_contents(__DIR__ . '/js-parser.html');
 
     echo $content;
+
     die;
 }
 
-if (get_env('APP_ENV') !== 'production' && filter_var(request_any_get('tracy', false), FILTER_VALIDATE_BOOL)) {
+if ((get_env('APP_ENV') !== 'production' || get_env('APP_DEBUG')) && filter_var(request_any_get('tracy', false), FILTER_VALIDATE_BOOL)) {
     require __DIR__ . '/tracy.php';
 }
 

@@ -55,7 +55,7 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 ## TODO: # 'length-le', 'lle'             # BETA value length is 'le'
 ```
 
-###### Filter example #1:
+#### Filter example #1:
 ```sh
 GET https://csv-to-json-api.vercel.app/?type=csv
 &source=...
@@ -73,7 +73,7 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 &filterValue=abc                  #or
 ```
 
-###### Filter example #2:
+#### Filter example #2:
 ```sh
 GET https://csv-to-json-api.vercel.app/?type=csv
 &headersToSnakeCase=true
@@ -82,6 +82,29 @@ GET https://csv-to-json-api.vercel.app/?type=csv
 &filters[1][key]=inativo
 &filters[1][operator]=ne
 &filters[1][value]=sim
+```
+
+#### Delimiter/separator example:
+```sh
+GET https://csv-to-json-api.vercel.app/?type=csv
+&delimiter=TAB
+&delimiter=SPACE
+&delimiter=COMMA
+&delimiter=SEMICOLON
+&delimiter=PIPE
+```
+
+#### Reading TSV file:
+```sh
+GET https://csv-to-json-api.vercel.app/?type=tsv
+&experimental_mode=TRUE
+&source=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2Fe%2F2...%26output%3Dtsv
+
+## OR
+
+GET https://csv-to-json-api.vercel.app/?type=csv
+&delimiter=TAB
+&source=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2Fe%2F2...%26output%3Dtsv
 ```
 
 ----
@@ -120,20 +143,45 @@ npx vercel
     - Select `products` sheet
     - Select `.csv` option
     - Copy the generated URL
-    - Encode the URL like `https://docs.google.com/spreadsheets/d/` to `https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd`
+    - Encoded the URL like `https://docs.google.com/spreadsheets/d/` to `https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd`
     - Use parsed URL on `source` request key
 4. Make request like `https://csv-to-json-api.vercel.app/?type=csv&source=YOUR_URL_HERE`
 -----
 
+### URL Encoding
+
+To safely pass a Google Sheets public URL as a query string parameter, you must **URL-encode** it.
+
+#### Original URL
+
+```txt
+https://docs.google.com/spreadsheets/d/e/2PACX-1vQn0RIYw6c7JNorQaH2TlQJv27_umansgaIFfnEknNTtTo4IgDGd2KRf6u_-4US1Fya2zNWP2TuCmK3/pub?gid=865796183&single=true&output=tsv
+````
+
+#### JavaScript (encode to a single string)
+
+```js
+const originalUrl =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQn0RIYw6c7JNorQaH2TlQJv27_umansgaIFfnEknNTtTo4IgDGd2KRf6u_-4US1Fya2zNWP2TuCmK3/pub?gid=865796183&single=true&output=tsv";
+
+const encodedUrl = encodeURIComponent(originalUrl);
+
+console.log(encodedUrl);
+```
+
+#### Encoded output
+
+```txt
+https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2Fe%2F2PACX-1vQn0RIYw6c7JNorQaH2TlQJv27_umansgaIFfnEknNTtTo4IgDGd2KRf6u_-4US1Fya2zNWP2TuCmK3%2Fpub%3Fgid%3D865796183%26single%3Dtrue%26output%3Dtsv
+```
+
+
 ## WIP
+- **[WIP]** Documentation
+- **[BETA]** Allow to read from POST JSON request
+- **[BETA]** Allow to read and parse TSV files
+- **[WIP]** Select columns to return
+- **[WIP]** Allow pass `SimpleExcelReader` params/methods/flags like `headersToSnakeCase`
 
 ### TODO
-- To improve documentation
-- Allow to read from POST JSON request
-- Select columns to return
-- Allow pass `SimpleExcelReader` params like `headersToSnakeCase`
-- Create `Vercel` config
-
-
-### DONE
-- ...
+<!--  -->
