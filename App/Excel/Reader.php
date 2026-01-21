@@ -8,13 +8,14 @@ class Reader
 {
     public static function experimentalMode(): bool
     {
-        return request_any_get('experimental_mode') === 'TRUE';    
+        return request_any_get('experimental_mode') === 'TRUE';
     }
 
     public static function response(array $options = []): void
     {
         try {
             $experimentalMode = static::experimentalMode();
+            $delimiter = null;
 
             $allowedTypes = [
                 'csv',
@@ -24,7 +25,7 @@ class Reader
 
             if ($experimentalMode) {
                 $allowedTypes[] = 'xls';
-                $allowedTypes[] = 'tsv';                
+                $allowedTypes[] = 'tsv';
             }
 
             $type = request_any_get('type', 'csv');
@@ -34,6 +35,29 @@ class Reader
                 response_as_json(['error' => 'Invalid Type', ...static::helpMessage()], 422);
 
                 exit((int) 422);
+            }
+
+            if ($type === 'csv') {
+                $delimiter = filter_var($options['delimiter'] ?? null, FILTER_DEFAULT, FILTER_NULL_ON_FAILURE) ?: null;
+                $delimiter ??= filter_var(request_any_get('delimiter', null), FILTER_DEFAULT, FILTER_NULL_ON_FAILURE) ?: null;
+            }
+
+            $delimiter = match ($delimiter) {
+                '', null, 'null', 'NULL' => null,
+                'TAB', '\t' => "\t",
+                'SPACE', ' ' => ' ',
+                'COMMA', ',' => ',',
+                'SEMICOLON', ';' => ';',
+                'PIPE', '|' => '|',
+                'DOUBLE-PIPE', '||' => '||',
+                'DOUBLE-SEMICOLON', ';;' => ';;',
+                'DOUBLE-COMMA', ',,' => ',,',
+                default => null,
+            };
+
+            if ($type === 'tsv') {
+                $type = 'csv';
+                $delimiter = "\t";
             }
 
             $source = request_any_get('source') ?: '';
@@ -70,7 +94,7 @@ class Reader
             $filterOperator = request_any_get('filterOperator', 'search');
 
             $filters = request_any_get('filters');
-            $filters = array_filter(is_array($filters) ? $filters : [], fn ($filter) => is_array($filter));
+            $filters = array_filter(is_array($filters) ? $filters : [], fn($filter) => is_array($filter));
 
             if (filled($filterBy) && (filled($filterValue) || filled($filterOperator))) {
                 $filters[] = [
@@ -82,7 +106,9 @@ class Reader
 
             $fromSheetName = $type != 'csv' ? request_any_get('fromSheetName') : null;
             $fromSheet = $type != 'csv' ? filter_var(request_any_get('fromSheet'), FILTER_VALIDATE_INT) : null;
-            $rows = SimpleExcelReader::create($sourceLocalPath, $type);
+            $rows = $type === 'csv' && $delimiter
+                ? SimpleExcelReader::create($sourceLocalPath, $type)->useDelimiter($delimiter)
+                : SimpleExcelReader::create($sourceLocalPath, $type);
 
             if ($fromSheetName) {
                 $rows = $rows->fromSheetName($fromSheetName);
@@ -152,6 +178,8 @@ class Reader
 
             die();
         } catch (\Throwable $th) {
+            throw $th;
+
             app_abort(500);
 
             exit((int) 500);

@@ -12,10 +12,21 @@ class Env
         string $envFile = '.env',
         array $initialData = [],
     ) {
+        $this->env = static::defaultEnvValues();
         $this->loadSystemEnv();
         $this->loadFromFile($baseDir, $envFile);
         $this->prepareEnv();
         $this->prepareInitialData($initialData);
+    }
+
+    protected static function defaultEnvValues(): array
+    {
+        return [
+            'APP_ENV' => 'production',
+            'APP_DEBUG' => false,
+            'APP_KEY' => null,
+            'APP_URL' => null,
+        ];
     }
 
     protected function loadFromFile(?string $baseDir = null, string $envFile = '.env'): void
@@ -81,7 +92,7 @@ class Env
         $checkAny = function (?string $str, callable $callable, array|string ...$values) {
             $values = is_array($values[0] ?? null) ? array_filter(
                 $values[0],
-                fn ($item) => $item && is_string($item)
+                fn($item) => $item && is_string($item)
             ) : $values;
 
             if (!$values) {

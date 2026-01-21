@@ -14,8 +14,8 @@ if (filter_var(request_any_get('ui', false), FILTER_VALIDATE_BOOL) || filter_var
     die;
 }
 
-if (filter_var(request_any_get('tracy', false), FILTER_VALIDATE_BOOL)) {
-    require_once __DIR__ . '/tracy.php';
+if (get_env('APP_ENV') !== 'production' && filter_var(request_any_get('tracy', false), FILTER_VALIDATE_BOOL)) {
+    require __DIR__ . '/tracy.php';
 }
 
 Reader::response();
