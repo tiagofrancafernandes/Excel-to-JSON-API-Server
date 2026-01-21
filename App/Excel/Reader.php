@@ -9,12 +9,21 @@ class Reader
     public static function response(array $options = []): void
     {
         try {
-            $type = request_any_get('type', 'csv');
-            $type = in_array($type, [
+            $experimentalMode = request_any_get('experimental_mode') === 'TRUE';
+
+            $allowedTypes = [
                 'csv',
                 'xlsx',
                 'ods',
-            ]) ? $type : null;
+            ];
+
+            if ($experimentalMode) {
+                $allowedTypes[] = 'xls';
+                $allowedTypes[] = 'tsv';                
+            }
+
+            $type = request_any_get('type', 'csv');
+            $type = in_array($type, $allowedTypes) ? $type : null;
 
             if (!$type) {
                 response_as_json(['error' => 'Invalid Type', ...static::helpMessage()], 422);
