@@ -6,10 +6,15 @@ use Spatie\SimpleExcel\SimpleExcelReader;
 
 class Reader
 {
+    public static function experimentalMode(): bool
+    {
+        return request_any_get('experimental_mode') === 'TRUE';    
+    }
+
     public static function response(array $options = []): void
     {
         try {
-            $experimentalMode = request_any_get('experimental_mode') === 'TRUE';
+            $experimentalMode = static::experimentalMode();
 
             $allowedTypes = [
                 'csv',
