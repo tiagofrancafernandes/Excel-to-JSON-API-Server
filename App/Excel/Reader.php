@@ -70,7 +70,7 @@ class Reader
             }
 
             $cacheTid = request_any_get('cache_tid', '');
-            $cacheTid = filter_var($cacheTid, FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE) ?: substr(time(), 0, 9);
+            $cacheTid = filter_var($cacheTid, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?: substr(time(), 0, 9);
 
             $sourceMD5 = md5($source);
             $sourceLocalPath = temp_path("excel-db-{$sourceMD5}-cacheTid-{$cacheTid}.{$type}");
